@@ -1,19 +1,9 @@
-#include "User.h"
+#include "FilmSelection.h"
 
-void User::setId(string _id)
-{
-	id = _id;
-}
-
-void User::addChannel(shared_ptr<Channel> ptr)
-{
-	channels.push_front(ptr);
-}
-
-void User::loadDate(string filename)
+void FilmSelection::loadDate(string filename)
 {
 	ifstream in(filename);
-	if (!in.is_open()) 
+	if (!in.is_open())
 		throw exception("file not found!");
 
 	if (strstr(filename.c_str(), "train_likes")) { //парсинг train_likes.csv
@@ -25,9 +15,9 @@ void User::loadDate(string filename)
 
 		shared_ptr<User> user = make_shared<User>(User());
 		shared_ptr<Channel> channel;
-		
+
 		//ВНИМАНИЕ
-		
+
 		in.seekg(30);//перевод на начало описания, зачем туда закинули именования в начале?
 		while (!in.eof())
 		{

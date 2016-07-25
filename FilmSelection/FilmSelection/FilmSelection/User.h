@@ -3,7 +3,14 @@
 
 #include "Channel.h"
 
-using namespace std;
+enum Title
+{
+	USER_ID,
+	ITEM_ID,
+	CHANNEL,
+	TIME,
+	NO_TITLE
+};
 
 class User
 {
@@ -13,6 +20,7 @@ private:
 public:
 	void setId(string _id);
 	void addChannel(shared_ptr<Channel>ptr);
+	static void loadDate(string filename);
 	User() = default;
 	~User() = default;
 };

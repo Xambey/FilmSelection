@@ -5,12 +5,24 @@
 #include <list>
 #include <iostream>
 #include <memory>
+#include <fstream>
+#include <exception>
+
 using namespace std;
 
 /*‘ильм, ‘ильм, ‘ильм, ‘ииииииииильм! :p
-извин€юсь за иерархию включений user->channel->film
-не было времени обдумать все моменты
+* »звин€юсь за иерархию включений filmSelection->user->channel->film,
+* не было времени обдумать все моменты
 */
+enum Title
+{
+	USER_ID,
+	ITEM_ID,
+	CHANNEL,
+	TIME,
+	NO_TITLE
+};
+
 class Channel;
 class Film
 {
@@ -20,7 +32,7 @@ private:
 	long long year; //год
 	int genre; //жанр 	
 	shared_ptr<list<string>> optional; //указатель на список опциональных переменных
-	unique_ptr<Channel> parent;
+	shared_ptr<Channel> parent;
 public:
 	Film(string id_item, long long _duration, long long _year, int _genre,shared_ptr<list<string>> ptr, shared_ptr<Channel> object);
 	Film(string id_item, shared_ptr<Channel> object);
