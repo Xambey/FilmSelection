@@ -5,6 +5,8 @@
 
 class FilmSelection
 {
+private:
+	static list<shared_ptr<User>> users;
 public:
 	FilmSelection() = default;
 	~FilmSelection() = default;

@@ -7,7 +7,7 @@ int main()
 {
 	try
 	{
-		FilmSelection::loadDate("Resources/train_likes.csv");
+		FilmSelection::loadDate("Resources/test_train_likes.csv");
 		system("pause");
 	}
 	catch (exception& e)

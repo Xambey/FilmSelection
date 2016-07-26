@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="Channel.cpp" />
     <ClCompile Include="Film.cpp" />
+    <ClCompile Include="FilmSelection.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="User.cpp" />
   </ItemGroup>
@@ -31,7 +32,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Channel.h" />
+    <ClInclude Include="Enums.h" />
     <ClInclude Include="Film.h" />
+    <ClInclude Include="FilmSelection.h" />
     <ClInclude Include="User.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
