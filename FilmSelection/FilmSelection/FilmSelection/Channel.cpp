@@ -5,12 +5,12 @@ void Channel::setId(string _id)
 	id = _id;
 }
 
-inline string Channel::getId() const
+string Channel::getId() const
 {
 	return id;
 }
 
-inline unsigned int Channel::getCountLikes() const
+unsigned int Channel::getCountLikes() const
 {
 	return count_likes;
 }
@@ -25,7 +25,7 @@ void Channel::increaseLikes()
 	++count_likes;
 }
 
-shared_ptr<Film> Channel::findFilm(string id_film)
+shared_ptr<Film> Channel::findFilmLike(string id_film)
 {
 	for (auto it = films.begin(); it != films.end(); it++)
 		if (id_film == (*it)->getId()) {
@@ -35,14 +35,22 @@ shared_ptr<Film> Channel::findFilm(string id_film)
 	return nullptr;
 }
 
-Channel::Channel(string _id, shared_ptr<User> object) :
+shared_ptr<Film> Channel::findFilmUnlike(string id_film)
+{
+	this->films;
+	for (auto it: films)
+		if (id_film ==  it->getId()) {
+			return it;
+		}
+	return nullptr;
+}
+
+Channel::Channel(string _id) :
 	id(_id),
-	parent(object),
 	count_likes(0)
 {
 }
-Channel::Channel(shared_ptr<User> object) :
-	parent(object),
+Channel::Channel() :
 	count_likes(0)
 {
 }

@@ -13,9 +13,9 @@ private:
 public:
 	void setId(string _id);
 	void addChannel(shared_ptr<Channel> ptr); 
-	inline string getId() const;
-	inline shared_ptr<list<shared_ptr<Channel>>> getChannels() const;
-	shared_ptr<Channel>findChannel(string id_channel); //ищет канал с таким же id , если находит то увеличивает лайки
+	string getId() const;
+	shared_ptr<list<shared_ptr<Channel>>> getChannels();
+	shared_ptr<Channel>findChannelLike(string id_channel); //ищет канал с таким же id , если находит то увеличивает лайки
 	User() = default;
 	~User() = default;
 };

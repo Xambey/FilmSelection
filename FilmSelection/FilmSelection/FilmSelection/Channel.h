@@ -10,16 +10,16 @@ private:
 	string id;
 	unsigned int count_likes;
 	list<shared_ptr<Film>> films;
-	shared_ptr<User> parent;
 public:
 	void setId(string _id);
-	inline string getId() const;
-	inline unsigned int getCountLikes() const;
+	string getId() const;
+	unsigned int getCountLikes() const;
 	void addFilm(shared_ptr<Film>ptr);
 	void increaseLikes();
-	shared_ptr<Film> findFilm(string id_film);
-	Channel(string _id, shared_ptr<User> object = nullptr);
-	Channel(shared_ptr<User> object = nullptr);
+	shared_ptr<Film> findFilmLike(string id_film); //поиск с лайком при нахождении
+	shared_ptr<Film> findFilmUnlike(string id_film);
+	Channel(string _id);
+	Channel();
 	~Channel() = default;
 };
 

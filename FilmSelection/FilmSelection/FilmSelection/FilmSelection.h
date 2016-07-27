@@ -10,7 +10,8 @@ private:
 public:
 	FilmSelection() = default;
 	~FilmSelection() = default;
-	static void loadDate(string filename);
+	static void loadDate(list<string>filenames);
+	static shared_ptr<Film> findFilmEverywere(string id);
 };
 
 #endif //FILMSELECTION_H

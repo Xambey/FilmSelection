@@ -1,19 +1,25 @@
 #include <fstream>
 #include "FilmSelection.h"
-
+#include <ctime>
 using namespace std;
 
 int main()
 {
 	try
 	{
-		FilmSelection::loadDate("Resources/test_train_likes.csv");
+		list<string>filenames; //онякеднбюрекэмнярэ бюфмю!
+		filenames.push_back("Resources/train_likes.csv");
+		filenames.push_back("Resources/items.json");
+
+		FilmSelection::loadDate(filenames);
+		cout << clock() / (double)CLOCKS_PER_SEC;
 		system("pause");
 	}
 	catch (exception& e)
 	{
-		cout << e.what();
+		cout << endl << e.what();
 		system("pause");
+		return -1;
 	}
 	return 0;
 }

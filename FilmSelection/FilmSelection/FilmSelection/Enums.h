@@ -1,12 +1,19 @@
 
 enum Title
 {
-	INTERM,
 	USER_ID,
 	ITEM_ID,
 	CHANNEL,
-	TIME,
-	NO_TITLE
+	TIME
+};
+
+enum FTitle
+{
+	ID,
+	DURATION,
+	YEAR,
+	GENRE
+	//OPTION
 };
 
 
