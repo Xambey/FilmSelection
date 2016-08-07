@@ -1,10 +1,12 @@
 #include "FilmSelection.h"
-list<shared_ptr<User>> FilmSelection::users;
 
-//оператор инкремента, перечисляемого типа
+list<shared_ptr<User>> FilmSelection::users;
+list<shared_ptr<Film>> FilmSelection::all_films;
+
+//Р°РІС‚РѕРїРµСЂРµРІРѕРґ РІ 0
 Title& operator++(Title& m) {
 	int x = static_cast<int>(m);
-	if (x == 3) 
+	if (x == 3)
 		m = static_cast<Title>(0);
 	else
 		m = static_cast<Title>(x + 1);
@@ -20,26 +22,25 @@ FTitle& operator++(FTitle& m) {
 	return m;
 }
 
+
 void FilmSelection::loadDate(list<string> filenames)
 {
-	for (auto filename : filenames) { //У МЕНЯ ЗАНИМАЕТ 10 МИН
-		if (filename == "Resources/train_likes.csv") { //парсинг train_likes.csv
+	for (auto filename : filenames) {
+		if (filename == "Resources/train_likes.csv") {
 			ifstream in(filename);
 			if (!in.is_open())
 				throw "file not found!";
-			string buf, item_id;
+			std::string buf, item_id;
 			char c;
 
 			Title mode = USER_ID;
-
+			string s;
 			shared_ptr<User> user;
 			shared_ptr<Channel> channel;
 			bool channel_found = false;
 			bool user_found = false;
 
-			//ВНИМАНИЕ
-
-			in.seekg(28);//перевод на начало описания, зачем туда закинули именования в начале?
+			in.seekg(28);
 			while (!in.eof())
 			{
 				in >> c;
@@ -48,14 +49,13 @@ void FilmSelection::loadDate(list<string> filenames)
 					{
 					case USER_ID:
 						for (auto it = users.begin(); it != users.end(); ++it) {
-							if ((*it)->getId() == buf) {
+							if (*((*it)->getId()) == buf) {
 								user = (*it);
 								user_found = true;
 							}
 						}
 						if (!user_found) {
-							user = make_shared<User>(User());
-							user.get()->setId(buf);
+							user = make_shared<User>(User(&buf));
 							users.push_back(user);
 						}
 						break;
@@ -63,30 +63,33 @@ void FilmSelection::loadDate(list<string> filenames)
 						item_id = buf;
 						break;
 					case CHANNEL:
-						//если какой-то пользователь уже имеет такой канал, инкрементируем его
 						for (auto it = users.begin(); it != users.end(); it++) {
-							channel = (*it)->findChannelLike(buf); //если канал не найден - nullptr
+							channel = (*it)->findChannelLike(&buf); //пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ - nullptr
 							if (channel != nullptr) {
-								if (channel->findFilmLike(item_id) == nullptr) {
-									channel->addFilm(make_shared<Film>(Film(item_id)));
+								channel_found = true; //РљР°РЅР°Р» РЅР°Р№РґРµРЅ
+								user->addChannel(channel);
+								shared_ptr<Film> t = channel->findFilmLike(&item_id);
+								if (t == nullptr) {
+									t = make_shared<Film>(Film(&item_id));
+									channel->addFilm(t);
+									all_films.push_back(t);
 								}
-								user.get()->addChannel(channel);
-								channel_found = true;
+								else
+									t.get()->increaseLikes();
 								break;
 							}
 						}
-
-						//канал не найден, создаем новый
 						if (!channel_found) {
-							channel = make_shared<Channel>(Channel());
-							channel.get()->increaseLikes(); //увеличить количество лайков
-							channel.get()->setId(buf);
-							channel->addFilm(make_shared<Film>(Film(item_id)));
-							user.get()->addChannel(channel);
+							channel = make_shared<Channel>(Channel(&buf));
+							channel->increaseLikes(); //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+
+							shared_ptr<Film> t = make_shared<Film>(Film(&item_id));
+							channel->addFilm(t);
+							user->addChannel(channel);
+							all_films.push_back(t);
+							break;
 						}
-						break;
 					case TIME:
-						//тут могла быть установка времени просмотра для фильмов в unordered_multimap(time, см. интерфейс) 
 						break;
 					}
 					user_found = false;
@@ -101,25 +104,14 @@ void FilmSelection::loadDate(list<string> filenames)
 			in.close();
 		}
 		else if (filename == "Resources/items.json") {
-			//Опциональные данные игнорируются, времени на них нет, для примерной точности они особо и не нужны
-
-
-			//Json::Reader reader;
-			//Json::Value root;
-			////взято с https://stackoverflow.com/questions/4273056/jsoncpp-not-reading-files-correctly
-			//reader.parse(in, root, false);
-			//
-			//string encoding = root.get("encoding", "UTF-8").asString();
 			ifstream in(filename);
 			if (!in.is_open())
 				throw "file not found!";
-
-			string buff("");
+			string buff;
 			string minibuf, id;
 			long double duration, year;
 			int genre;
 			char s;
-			bool miss = false;
 			bool active = false;
 			FTitle mode = ID;
 			size_t pos;
@@ -142,76 +134,85 @@ void FilmSelection::loadDate(list<string> filenames)
 					continue;
 				}
 				else if (!active) {
-					//считываем данные для обновления
 					minibuf = "id";
 					pos = buff.find(minibuf) + 5;
 					minibuf.clear();
-					for (auto it = pos; it < buff.size(); it++) {
-						if (buff[it] == '"')
+					for (auto it = buff.begin() + pos; it != buff.end(); it++) {
+						if (*it == '"')
 							break;
 						else
-							minibuf += buff[it];
+							minibuf += *it;
 					}
+					//cout << endl << "minibuff = " << minibuf << endl;
 					id = minibuf;
+					//if (id == "bf636dea4358b500f7441e8a621849b3")
+					//	cout << "Found" << endl;
+					//cout << "id = " << id << endl;
 					minibuf = "duration";
 					pos = buff.find(minibuf) + 10;
 					minibuf.clear();
-					for (auto it = pos; it < buff.size(); it++) {
-						if (buff[it] == ',')
+					for (auto it = buff.begin() + pos; it != buff.end(); it++) {
+						if (*it == ',')
 							break;
 						else
-							minibuf += buff[it];
+							minibuf += *it;
 					}
+					//cout << "minibuff = " << minibuf << endl;
 					duration = stold(minibuf);
+					//cout << "duration = " << duration << endl;
+
 					minibuf = "year";
 					pos = buff.find(minibuf) + 6;
 					minibuf.clear();
-					for (auto it = pos; it < buff.size(); it++) {
-						if (buff[it] == ',')
+					for (auto it = buff.begin() + pos; it != buff.end(); it++) {
+						if (*it == ',')
 							break;
 						else
-							minibuf += buff[it];
+							minibuf += *it;
 					}
+					//cout << "minibuff = " << minibuf << endl;
 					year = stold(minibuf);
+					//cout << "year = " << year << endl;
 
 					minibuf = "genre";
 					pos = buff.find(minibuf) + 7;
 					minibuf.clear();
-					for (auto it = pos; it < buff.size(); it++) {
-						if (buff[it] == ',')
+					for (auto it = buff.begin() + pos; it != buff.end(); it++) {
+						if (*it == ',')
 							break;
 						else
-							minibuf += buff[it];
+							minibuf += *it;
 					}
+					//cout << "minibuff = " << minibuf << endl;
 					genre = stoi(minibuf);
-					auto film = findFilmEverywere(id);
-					if (film == nullptr) throw "Film not found! ";
-					film.get()->setDuration(duration);
-					film.get()->setGenre(genre);
-					film.get()->setYear(year);
-					//++mode;
+					//cout << "genre = " << genre << endl;
+					auto film = findFilmEverywere(&id);
+
+					if (film == nullptr) { //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+						all_films.push_back(make_shared<Film>(Film(&id, &duration, &year, &genre)));
+					}
+					else {
+						film.get()->setDuration(&duration);
+						film.get()->setGenre(&genre);
+						film.get()->setYear(&year);
+						//++mode;
+					}
 					buff.clear();
-					in.get();
-					if (!in.eof())
-						in.get();
 				}
 			}
 			in.close();
 		}
-	}
-}
+		else if (filename == "Resources/schedule.csv") {
 
-shared_ptr<Film> FilmSelection::findFilmEverywere(string id)
-{
-	for (auto it: users) {
-		for (auto f = it->getChannels()->begin(); f != it->getChannels()->end(); f++) {
-			shared_ptr<Film> t (f->get()->findFilmUnlike(id));
-			if (t == nullptr)
-				continue;
-			else
-				return t;
 		}
 	}
-	return nullptr;
 }
 
+shared_ptr<Film> FilmSelection::findFilmEverywere(string* id)
+{
+	shared_ptr<Film> f = make_shared<Film>(Film(id));
+	auto it = find(all_films.begin(), all_films.end(), f);
+	if (it != all_films.end())
+		return *it;
+	return nullptr;
+}
