@@ -1,49 +1,53 @@
 #include "Film.h"
 
-Film::Film(string id_item, long double _duration, long double _year, int _genre, shared_ptr<list<string>> ptr) :
-	id(id_item),
-	duration(_duration),
-	year(_year),
-	genre(_genre),
-	optional(ptr),
+Film::Film(string* id_item, long double* _duration, long double* _year, int* _genre, shared_ptr<list<string>> option) :
+	id((*id_item)),
+	duration((*_duration)),
+	year((*_year)),
+	genre((*_genre)),
+	optional(option),
 	count_likes(0)
+{
+}
+
+Film::Film(string* id_item, shared_ptr<list<string>> option) :
+	id((*id_item)),
+	duration(0),
+	year(0),
+	genre(0),
+	count_likes(0),
+	optional(option)
 {
 	increaseLikes();
 }
 
-Film::Film(string id_item) :
-	id(id_item),
-	count_likes(0)
+string *Film::getId()
 {
-	increaseLikes();
+	return &id;
 }
 
-string Film::getId() const
+void Film::setId(string* _id)
 {
-	return id;
+	id = (*_id);
 }
 
-void Film::setId(string _id)
+void Film::setDuration(long double* _dur)
 {
-	id = _id;
+	duration = (*_dur);
 }
 
-void Film::setDuration(long double _dur)
+void Film::setYear(long double* _year)
 {
-	duration = _dur;
+	year = (*_year);
 }
 
-void Film::setYear(long double _year)
+void Film::setGenre(int* gen)
 {
-	year = _year;
-}
-
-void Film::setGenre(int gen)
-{
-	genre = gen;
+	genre = *gen;
 }
 
 void Film::increaseLikes()
 {
 	count_likes++;
 }
+

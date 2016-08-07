@@ -1,6 +1,8 @@
 #ifndef FILM_H
 #define FILM_H
 
+#include "Time.h"
+
 #include <string>
 #include <list>
 #include <iostream>
@@ -9,13 +11,13 @@
 #include <fstream>
 #include <exception>
 #include <unordered_map>
-//#include "jsoncpp\include\json\json.h" //Подключаем библиотеку jsoncpp
+//#include "jsoncpp\include\json\json.h" //РїРѕРґРєР»СЋС‡РµРЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё jsoncpp
 
 using namespace std;
 
-/*Фильм, Фильм, Фильм, Фииииииииильм! :p
-* Извиняюсь за иерархию включений filmSelection->user->channel->film,
-* не было времени обдумать все моменты
+/*
+* Р—РґРµСЃСЊ РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ СЃР»РµРґСѓСЋС‰Р°СЏ РёРµСЂР°СЂС…РёСЏ:
+* filmSelection->user->channel->film,
 */
 
 class Channel;
@@ -23,23 +25,22 @@ class Film
 {
 private:
 	string id;
-	long double duration; //коэффициент продолжительности фильма
-	long double year; //год
-	int genre; //жанр 	
+	long double duration; //РљРѕСЌС„С„РёС†РёРµРЅС‚ РїСЂРѕРґРѕР»Р¶РёС‚РµР»СЊРЅРѕСЃС‚Рё С„РёР»СЊРјР°
+	long double year; //РіРѕРґ
+	int genre; //Р¶Р°РЅСЂ
 	unsigned int count_likes;
-	shared_ptr<list<string>> optional; //указатель на список опциональных переменных
+	shared_ptr<list<Time>> time;
+	shared_ptr<list<string>> optional; //СЃРїРёСЃРѕРє СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° РѕРїС†РёРѕРЅР°Р»СЊРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ
 public:
-	//конструктор без лайка
-	Film(string id_item, long double _duration, long double _year, int _genre,shared_ptr<list<string>> ptr);
-	Film(string id_item); //конструктор с лайком
-	string getId() const;
-	void setId(string _id);
-	void setDuration(long double _dur);
-	void setYear(long double _year);
-	void setGenre(int gen);
+	Film(string* id_item, long double* _duration, long double* _year, int* _genre,shared_ptr<list<string>> option = nullptr);
+	Film(string* id_item, shared_ptr<list<string>> option = nullptr); //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ, СЃ Р»Р°Р№РєРѕРј
+	string *getId();
+	void setId(string* _id);
+	void setDuration(long double* _dur);
+	void setYear(long double* _year);
+	void setGenre(int* gen);
 	void increaseLikes();
 	~Film() = default;
 };
 
 #endif //FILM_H
-

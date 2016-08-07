@@ -7,10 +7,9 @@ int main()
 {
 	try
 	{
-		list<string>filenames; //ÏÎÑËÅÄÎÂÀÒÅËÜÍÎÑÒÜ ÂÀÆÍÀ!
+		list<string>filenames; //ĞŸĞ¾ÑĞ»ĞµĞ´Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ÑŒĞ½Ğ¾ÑÑ‚ÑŒ Ğ²Ğ°Ğ¶Ğ½Ğ°!
 		filenames.push_back("Resources/train_likes.csv");
 		filenames.push_back("Resources/items.json");
-
 		FilmSelection::loadDate(filenames);
 		cout << clock() / (double)CLOCKS_PER_SEC;
 		system("pause");
