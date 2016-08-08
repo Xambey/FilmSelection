@@ -3,6 +3,15 @@
 list<shared_ptr<User>> FilmSelection::users;
 list<shared_ptr<Film>> FilmSelection::all_films;
 
+Schedule& operator++(Schedule& m) {
+	int x = static_cast<int>(m);
+	if (x == 3)
+		m = static_cast<Schedule>(0);
+	else
+		m = static_cast<Schedule>(x + 1);
+	return m;
+}
+
 //автоперевод в 0
 Title& operator++(Title& m) {
 	int x = static_cast<int>(m);
@@ -12,16 +21,6 @@ Title& operator++(Title& m) {
 		m = static_cast<Title>(x + 1);
 	return m;
 }
-
-FTitle& operator++(FTitle& m) {
-	int x = static_cast<int>(m);
-	if (x == 3)
-		m = static_cast<FTitle>(0);
-	else
-		m = static_cast<FTitle>(x + 1);
-	return m;
-}
-
 
 void FilmSelection::loadDate(list<string> filenames)
 {
@@ -33,7 +32,7 @@ void FilmSelection::loadDate(list<string> filenames)
 			std::string buf, item_id;
 			char c;
 
-			Title mode = USER_ID;
+			Title mode = Title::USER_ID;
 			string s;
 			shared_ptr<User> user;
 			shared_ptr<Channel> channel;
@@ -47,7 +46,7 @@ void FilmSelection::loadDate(list<string> filenames)
 				if (c == ',' || c == '.') {
 					switch (mode)
 					{
-					case USER_ID:
+					case Title::USER_ID:
 						for (auto it = users.begin(); it != users.end(); ++it) {
 							if (*((*it)->getId()) == buf) {
 								user = (*it);
@@ -59,10 +58,10 @@ void FilmSelection::loadDate(list<string> filenames)
 							users.push_back(user);
 						}
 						break;
-					case ITEM_ID:
+					case Title::ITEM_ID:
 						item_id = buf;
 						break;
-					case CHANNEL:
+					case Title::CHANNEL:
 						for (auto it = users.begin(); it != users.end(); it++) {
 							channel = (*it)->findChannelLike(&buf); //���� ����� �� ������ - nullptr
 							if (channel != nullptr) {
@@ -89,7 +88,7 @@ void FilmSelection::loadDate(list<string> filenames)
 							all_films.push_back(t);
 							break;
 						}
-					case TIME:
+					case Title::TIME:
 						break;
 					}
 					user_found = false;
@@ -113,7 +112,6 @@ void FilmSelection::loadDate(list<string> filenames)
 			int genre;
 			char s;
 			bool active = false;
-			FTitle mode = ID;
 			size_t pos;
 
 			while (!in.eof())
@@ -143,11 +141,8 @@ void FilmSelection::loadDate(list<string> filenames)
 						else
 							minibuf += *it;
 					}
-					//cout << endl << "minibuff = " << minibuf << endl;
 					id = minibuf;
-					//if (id == "bf636dea4358b500f7441e8a621849b3")
-					//	cout << "Found" << endl;
-					//cout << "id = " << id << endl;
+
 					minibuf = "duration";
 					pos = buff.find(minibuf) + 10;
 					minibuf.clear();
@@ -157,9 +152,7 @@ void FilmSelection::loadDate(list<string> filenames)
 						else
 							minibuf += *it;
 					}
-					//cout << "minibuff = " << minibuf << endl;
 					duration = stold(minibuf);
-					//cout << "duration = " << duration << endl;
 
 					minibuf = "year";
 					pos = buff.find(minibuf) + 6;
@@ -170,9 +163,8 @@ void FilmSelection::loadDate(list<string> filenames)
 						else
 							minibuf += *it;
 					}
-					//cout << "minibuff = " << minibuf << endl;
 					year = stold(minibuf);
-					//cout << "year = " << year << endl;
+
 
 					minibuf = "genre";
 					pos = buff.find(minibuf) + 7;
@@ -183,19 +175,16 @@ void FilmSelection::loadDate(list<string> filenames)
 						else
 							minibuf += *it;
 					}
-					//cout << "minibuff = " << minibuf << endl;
 					genre = stoi(minibuf);
-					//cout << "genre = " << genre << endl;
 					auto film = findFilmEverywere(&id);
 
-					if (film == nullptr) { //����������� �����
+					if (film == nullptr) {
 						all_films.push_back(make_shared<Film>(Film(&id, &duration, &year, &genre)));
 					}
 					else {
 						film.get()->setDuration(&duration);
 						film.get()->setGenre(&genre);
 						film.get()->setYear(&year);
-						//++mode;
 					}
 					buff.clear();
 				}
@@ -203,7 +192,61 @@ void FilmSelection::loadDate(list<string> filenames)
 			in.close();
 		}
 		else if (filename == "Resources/schedule.csv") {
+			ifstream in(filename);
+			if (!in.is_open())
+				throw "file not found!";
 
+			string buffer, _item_id;
+			long double time_start, time_end;
+			char n;
+		    Schedule s_mode = Schedule::TIME_END;
+
+			in.seekg(35);
+
+			while (!in.eof()) {
+				//ЗАМЕТКА: СДЕЛАТЬ ОБРАБОТКУ ПОСТРОЧНО ПО ЗАПЯТЫМ И ПРОВЕРКУ ID СРАЗУ
+				in >> n;
+				if (n == ',' || n == '.') {
+					switch (s_mode)
+					{
+					case Schedule::TIME_END:
+						buffer += '.';
+						if (n == '.')
+							while ((n = in.get()) != ',')
+								buffer += n;
+						else
+							buffer += ".0";
+						time_end = stold(buffer);
+						break;
+					case Schedule::TIME_START:
+						if (n == '.') {
+							buffer += '.';
+							while ((n = in.get()) != ',')
+								buffer += n;
+						}
+						else
+							buffer += ".0";
+						time_start = stold(buffer);
+						break;
+					case Schedule::S_ITEM_ID:
+						_item_id = buffer;
+						break;
+					case Schedule::S_CHANNEL:
+						auto it = findFilmEverywere(&buffer);
+						if (it == nullptr) break;//film not found
+						Time t(&time_start,&time_end,&buffer);
+
+						it->getTime()->push_back(t);
+						break;
+					}
+					buffer.clear();
+					++s_mode;
+				}
+				else {
+					buffer += n;
+				}
+			}
+			in.close();
 		}
 	}
 }

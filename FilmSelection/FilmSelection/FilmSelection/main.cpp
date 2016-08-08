@@ -10,6 +10,7 @@ int main()
 		list<string>filenames; //Последовательность важна!
 		filenames.push_back("Resources/train_likes.csv");
 		filenames.push_back("Resources/items.json");
+		filenames.push_back("Resources/schedule.csv");
 		FilmSelection::loadDate(filenames);
 		cout << clock() / (double)CLOCKS_PER_SEC;
 		system("pause");

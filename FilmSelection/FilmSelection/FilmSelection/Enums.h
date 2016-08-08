@@ -7,13 +7,11 @@ enum Title
 	TIME
 };
 
-enum FTitle
+enum Schedule
 {
-	ID,
-	DURATION,
-	YEAR,
-	GENRE
-	//OPTION
+	TIME_END,
+	TIME_START,
+	S_ITEM_ID,
+	S_CHANNEL
 };
-
 
