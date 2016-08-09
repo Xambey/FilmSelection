@@ -13,6 +13,8 @@ public:
 	~FilmSelection() = default;
 	static void loadDate(list<string>filenames);
 	static shared_ptr<Film> findFilmEverywere(string* id);
+	shared_ptr<Time> getScheduleFilm(string * id, string * filename);
+	void filmSelection();
 };
 
 #endif //FILMSELECTION_H

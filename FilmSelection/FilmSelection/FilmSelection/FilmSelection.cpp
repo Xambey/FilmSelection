@@ -55,7 +55,7 @@ void FilmSelection::loadDate(list<string> filenames)
 						}
 						if (!user_found) {
 							user = make_shared<User>(User(&buf));
-							users.push_back(user);
+							users.push_back(user);		
 						}
 						break;
 					case Title::ITEM_ID:
@@ -230,6 +230,7 @@ void FilmSelection::loadDate(list<string> filenames)
 						break;
 					case Schedule::S_ITEM_ID:
 						_item_id = buffer;
+						cout << (int)in.tellg();
 						break;
 					case Schedule::S_CHANNEL:
 						auto it = findFilmEverywere(&buffer);
@@ -253,9 +254,24 @@ void FilmSelection::loadDate(list<string> filenames)
 
 shared_ptr<Film> FilmSelection::findFilmEverywere(string* id)
 {
-	shared_ptr<Film> f = make_shared<Film>(Film(id));
-	auto it = find(all_films.begin(), all_films.end(), f);
-	if (it != all_films.end())
-		return *it;
+	for (auto it = all_films.begin(); it != all_films.end(); ++it)
+		if (*((*it)->getId()) == *id)
+			return *it;
+
+	//if (it != all_films.end())
+	//	return *it;
 	return nullptr;
+}
+
+shared_ptr<Time> FilmSelection::getScheduleFilm(string* id, string* filename)
+{
+
+}
+
+void FilmSelection::filmSelection()
+{
+	string id;
+	cout << "Enter user id for selection: ";
+	cin >> id;
+
 }
