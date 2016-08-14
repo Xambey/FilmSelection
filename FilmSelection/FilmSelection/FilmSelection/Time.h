@@ -2,7 +2,9 @@
 #define TIME_H
 
 #include <string>
+#include <cstring>
 #include <list>
+#include <vector>
 #include <iostream>
 #include <algorithm>
 #include <memory>

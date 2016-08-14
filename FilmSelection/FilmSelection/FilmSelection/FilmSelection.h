@@ -11,10 +11,11 @@ private:
 public:
 	FilmSelection() = default;
 	~FilmSelection() = default;
-	static void loadDate(list<string>filenames);
+	static void loadDate(list<string> filenames);
 	static shared_ptr<Film> findFilmEverywere(string* id);
-	shared_ptr<Time> getScheduleFilm(string * id, string * filename);
-	void filmSelection();
+	static unique_ptr<vector<shared_ptr<Time>>> getScheduleFilm(string * id, string * filename);
+	void filmSelection(string* user_id);
+	unique_ptr<User> findUser(string* user_id);
 };
 
 #endif //FILMSELECTION_H

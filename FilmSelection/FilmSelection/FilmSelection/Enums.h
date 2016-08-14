@@ -1,5 +1,5 @@
 
-enum Title
+enum class Title
 {
 	USER_ID,
 	ITEM_ID,
@@ -7,11 +7,11 @@ enum Title
 	TIME
 };
 
-enum Schedule
+enum class Schedule
 {
 	TIME_END,
 	TIME_START,
-	S_ITEM_ID,
-	S_CHANNEL
+	ITEM_ID,
+	CHANNEL
 };
 

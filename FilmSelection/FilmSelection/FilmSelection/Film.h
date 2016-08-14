@@ -4,7 +4,7 @@
 #include "Time.h"
 //#include "jsoncpp\include\json\json.h" //подключение библиотеки jsoncpp
 /*
-* Здесь присутствует следующая иерархия:
+* Здесь присутствует следующая иерархия включений:
 * filmSelection->user->channel->film->Time,
 */
 
@@ -29,6 +29,8 @@ public:
 	void setYear(long double* _year);
 	void setGenre(int* gen);
 	void increaseLikes();
+	//Сделать генератор фильмов 
+
 	~Film() = default;
 };
 

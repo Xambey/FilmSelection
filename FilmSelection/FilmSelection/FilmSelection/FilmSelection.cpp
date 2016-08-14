@@ -63,7 +63,7 @@ void FilmSelection::loadDate(list<string> filenames)
 						break;
 					case Title::CHANNEL:
 						for (auto it = users.begin(); it != users.end(); it++) {
-							channel = (*it)->findChannelLike(&buf); //���� ����� �� ������ - nullptr
+							channel = (*it)->findChannelLike(&buf);
 							if (channel != nullptr) {
 								channel_found = true; //Канал найден
 								user->addChannel(channel);
@@ -80,7 +80,7 @@ void FilmSelection::loadDate(list<string> filenames)
 						}
 						if (!channel_found) {
 							channel = make_shared<Channel>(Channel(&buf));
-							channel->increaseLikes(); //��������� ���������� ������
+							channel->increaseLikes(); 
 
 							shared_ptr<Film> t = make_shared<Film>(Film(&item_id));
 							channel->addFilm(t);
@@ -204,7 +204,6 @@ void FilmSelection::loadDate(list<string> filenames)
 			in.seekg(35);
 
 			while (!in.eof()) {
-				//ЗАМЕТКА: СДЕЛАТЬ ОБРАБОТКУ ПОСТРОЧНО ПО ЗАПЯТЫМ И ПРОВЕРКУ ID СРАЗУ
 				in >> n;
 				if (n == ',' || n == '.') {
 					switch (s_mode)
@@ -228,11 +227,11 @@ void FilmSelection::loadDate(list<string> filenames)
 							buffer += ".0";
 						time_start = stold(buffer);
 						break;
-					case Schedule::S_ITEM_ID:
+					case Schedule::ITEM_ID:
 						_item_id = buffer;
 						cout << (int)in.tellg();
 						break;
-					case Schedule::S_CHANNEL:
+					case Schedule::CHANNEL:
 						auto it = findFilmEverywere(&buffer);
 						if (it == nullptr) break;//film not found
 						Time t(&time_start,&time_end,&buffer);
@@ -258,20 +257,75 @@ shared_ptr<Film> FilmSelection::findFilmEverywere(string* id)
 		if (*((*it)->getId()) == *id)
 			return *it;
 
-	//if (it != all_films.end())
-	//	return *it;
 	return nullptr;
 }
 
-shared_ptr<Time> FilmSelection::getScheduleFilm(string* id, string* filename)
+unique_ptr<vector<shared_ptr<Time>>> FilmSelection::getScheduleFilm(string* id, string* filename)
 {
+	string buf, str;
+	long double time_start, time_end;
+	Schedule mode = Schedule::TIME_END;
+	ifstream in(*filename);
+	vector<shared_ptr<Time>> time;
+	int count = 0;
+	int count2 = 0;
+
+	getline(in, buf);
+
+	while (!in.eof()) {
+		getline(in, buf);
+		if (buf.find(*id) != string::npos)
+		{
+			count++;
+			for (auto it = buf.begin(); it != buf.end(); it++) {
+				while (*it != ',') {
+					str += *it;
+					it++;
+					if (it == buf.end()) {
+						it--;
+						break;
+					}
+				}
+				switch (mode)
+				{
+				case Schedule::TIME_END:
+					time_end = stold(str);
+					break;
+				case Schedule::TIME_START:
+					time_start = stold(str);
+					break;
+				case Schedule::ITEM_ID:
+					break;
+				case Schedule::CHANNEL:
+					count2++;
+					time.push_back(make_shared<Time>(Time(&time_start, &time_end, &str)));
+					break;
+				}
+				str.clear();
+				++mode;
+			}
+		}
+		buf.clear();
+	}
+	cout << count2 << endl;
+	cout << count;
+	in.close();	
+	return make_unique<vector<shared_ptr<Time>>>(time);
+}
+
+void FilmSelection::filmSelection(string * user_id)
+{
+	shared_ptr<User> user(findUser(user_id));
+	
+	if (!user) throw "user not found\n";
+	
 
 }
 
-void FilmSelection::filmSelection()
+unique_ptr<User> FilmSelection::findUser(string * user_id)
 {
-	string id;
-	cout << "Enter user id for selection: ";
-	cin >> id;
-
+	for (auto it = users.begin(); it != users.end(); it++)
+		if (*((*it)->getId()) == *user_id)
+			return make_unique<User>(*it);
+	return nullptr;
 }
